@@ -1,0 +1,26 @@
+- name: "Ensure /home/{{ deploy_user }}/web/etc dir exists"
+  become: true
+  file: 
+    path: "/home/{{ deploy_user }}/web/etc"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: 0755
+
+
+- name: "Copy nginx site config to deploy user dir"
+  become: true
+  copy:
+    src: files/nginx.conf
+    dest: "/home/{{ deploy_user }}/web/etc/nginx.conf"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: 0644
+
+- name: "Copy site configuration to main nginx dir as symlink"
+  become: yes
+  file:
+    src: "/home/{{ deploy_user }}/web/etc/nginx.conf"
+    dest: /etc/nginx/conf.d/stepik.conf
+    state: link
+  notify: restart nginx

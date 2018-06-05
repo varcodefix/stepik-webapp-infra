@@ -1,0 +1,7 @@
+---
+# handlers file for webapp
+
+- name: restart nginx
+  become: true
+  systemd: name=nginx state=reloaded
+

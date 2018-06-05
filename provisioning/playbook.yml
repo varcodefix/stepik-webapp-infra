@@ -1,0 +1,21 @@
+---
+- name: Install and configure webapp with nginx on Debian host 
+  hosts: all
+
+  pre_tasks:
+    - name: Install python for Ansible
+      become: true
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+    
+    - name: Install git
+      become: true
+      when: ansible_os_family == 'Debian'
+      apt:
+        name: git
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - webapp

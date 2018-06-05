@@ -1,0 +1,15 @@
+- name: "Create user for deploy"
+  become: true
+  user:
+    name: "{{ deploy_user }}"
+    comment: deploy user for webapp
+    state: present
+
+- name: "Obtain webapp code"
+  become: yes
+  become_user: "{{deploy_user}}"
+  git:
+    repo: https://github.com/varcodefix/stepik-webapp-site.git
+    dest: "/home/{{ deploy_user }}/web"
+    version: master
+  notify: restart nginx
