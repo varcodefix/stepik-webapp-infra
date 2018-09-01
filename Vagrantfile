@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "debian/stretch64"
-  config.vm.define "debian-nginx"
+  config.vm.box = "alxgrh/ubuntu-trusty-x86_64"
+  config.vm.define "trusty-nginx"
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
@@ -59,15 +59,17 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you are using for more
   # information on available options.
+  
+  config.ssh.forward_agent = true
+
   config.vm.provider :libvirt do |libvirt|
     libvirt.storage_pool_name = "Data3-VM"
   end
 
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "provisioning/playbook.yml"
-	ansible.raw_arguments = ['-e pipelining=True']
-	ansible.raw_ssh_args = ['-o ForwardAgent=yes']
-#	ansible.verbose = "v"
+	# ansible.raw_arguments = ['-e ansible_python_interpreter=/usr/bin/python3']
+	# ansible.verbose = "vvvvv"
   end
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the

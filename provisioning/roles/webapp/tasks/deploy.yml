@@ -5,11 +5,56 @@
     comment: deploy user for webapp
     state: present
 
-- name: "Obtain webapp code"
-  become: yes
-  become_user: "{{deploy_user}}"
-  git:
-    repo: https://github.com/varcodefix/stepik-webapp-site.git
-    dest: "/home/{{ deploy_user }}/web"
-    version: master
-  notify: restart nginx
+- name: "The Hack: install an acl package"
+  when: (ansible_os_family == 'Debian') and (webapp_git_repo_is_private == True)
+  become: true
+  apt:
+    name: acl
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: 'The Hack: grant access to the socket to {{ deploy_user }}'
+  when: webapp_git_repo_is_private == True
+  become: false
+  acl: name='{{ item }}' etype=user entity='{{ deploy_user }}' permissions="rwx" state=present
+  with_items:
+    - "{{ ansible_env.SSH_AUTH_SOCK|dirname }}"
+    - "{{ ansible_env.SSH_AUTH_SOCK }}"
+
+- block:
+  - name: "Ensure we have ForwardAgent"
+    when: webapp_git_repo_is_private == True
+    command: ssh-add -l
+    become: true
+    become_user: "{{ deploy_user }}"
+    become_flags: '-HE' # keep environment hold the ssh-agent socket
+  
+  - name: "Obtain the webapp code"
+    become: true
+    become_user: "{{ deploy_user }}"
+    become_flags: '-HE'  # keep environment hold the ssh-agent socket
+    git:
+      repo: "{{ webapp_git_repo_url }}"
+      dest: "/home/{{ deploy_user }}/web"
+      version: "{{ webapp_git_branch }}"
+      accept_hostkey: yes
+    notify:
+      - reload nginx
+      - reload gunicorn
+  always:
+  - name: '(Hack: revoke access to the socket to {{ deploy_user }})'
+    when: webapp_git_repo_is_private == True
+    become: false
+    acl: name='{{ item }}' etype=user entity='{{ deploy_user }}' state=absent
+    with_items:
+      - "{{ ansible_env.SSH_AUTH_SOCK|dirname }}"
+      - "{{ ansible_env.SSH_AUTH_SOCK }}"
+  
+  # - name: "Remove an acl package"
+  #   when: ansible_os_family == 'Debian'
+  #   become: true
+  #   apt:
+  #     name: acl
+  #     update_cache: yes
+  #     cache_valid_time: 3600
+  #     state: absent

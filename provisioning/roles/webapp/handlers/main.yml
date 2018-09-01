@@ -1,7 +1,10 @@
 ---
 # handlers file for webapp
 
-- name: restart nginx
+- name: reload nginx
   become: true
-  systemd: name=nginx state=reloaded
+  service: name=nginx state=reloaded enabled=yes
 
+- name: reload gunicorn
+  become: true
+  service: name=gunicorn state=reloaded enabled=yes

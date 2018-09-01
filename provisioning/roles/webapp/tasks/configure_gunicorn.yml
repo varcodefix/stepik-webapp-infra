@@ -1,26 +1,27 @@
 - name: "Ensure /home/{{ deploy_user }}/web/etc dir exists"
   become: true
-  file: 
+  file:
     path: "/home/{{ deploy_user }}/web/etc"
     state: directory
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
     mode: 0755
 
-- name: "Copy nginx site config to deploy user dir"
+
+- name: "Copy gunicorn wsgi app config to deploy user dir"
   become: true
   copy:
-    src: files/nginx.conf
-    dest: "/home/{{ deploy_user }}/web/etc/nginx.conf"
+    src: files/hello_app.conf.py
+    dest: "/home/{{ deploy_user }}/web/etc/hello.py"
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
     mode: 0644
-  notify: reload nginx
+  notify: reload gunicorn
 
-- name: "Copy site configuration to main nginx dir as symlink"
+- name: "Copy app configuration to main gunicorn dir as symlink"
   become: true
   file:
-    src: "/home/{{ deploy_user }}/web/etc/nginx.conf"
-    dest: /etc/nginx/conf.d/stepik.conf
+    src: "/home/{{ deploy_user }}/web/etc/hello.py"
+    dest: /etc/gunicorn.d/hello.py
     state: link
-  notify: reload nginx
+  notify: reload gunicorn

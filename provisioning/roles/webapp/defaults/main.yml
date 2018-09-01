@@ -2,3 +2,6 @@
 # defaults file for webapp
 
 deploy_user: box
+webapp_git_repo_is_private: False
+webapp_git_repo_url: https://github.com/varcodefix/stepik-webapp-site.git
+webapp_git_branch: 01-09-01_gunicorn

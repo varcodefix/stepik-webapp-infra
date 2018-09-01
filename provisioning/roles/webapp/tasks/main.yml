@@ -1,7 +1,8 @@
 ---
 # tasks file for webapp
 
-- include: install_nginx.yml
-- include: deploy.yml
-- include: configure_nginx.yml
-  # - include: deploy.yml
+ - include: install_nginx.yml
+ - include: install_gunicorn.yml
+ - include: deploy.yml
+ - include: configure_nginx.yml
+ - include: configure_gunicorn.yml

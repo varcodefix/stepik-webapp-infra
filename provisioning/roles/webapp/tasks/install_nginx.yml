@@ -3,14 +3,14 @@
     when: ansible_os_family == 'Debian'
     become: true
     apt_key:
-        url: https://nginx.ru/keys/nginx_signing.key
+        url: https://nginx.org/keys/nginx_signing.key
         state: present
 
   - name: "Add a nginx repo"
     when: ansible_os_family == 'Debian'
     become: true
     apt_repository:
-        repo: deb http://nginx.org/packages/mainline/debian/ {{ansible_distribution_release}} nginx
+        repo: "deb http://nginx.org/packages/mainline/{{ansible_distribution | lower}} {{ansible_distribution_release}} nginx"
         filename: nginx-stable
         state: present
 
@@ -23,8 +23,6 @@
       cache_valid_time: 3600
 
   - name: "Enable a nginx service"
-    systemd:
+    service:
       name: nginx
       enabled: yes
-      masked: no
-
