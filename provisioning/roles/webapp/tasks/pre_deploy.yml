@@ -1,0 +1,24 @@
+---
+- name: "Create user \"{{ deploy_user }}\" for deploy"
+  become: true
+  user:
+    name: "{{ deploy_user }}"
+    comment: deploy user for webapp
+    state: present
+
+- name: "Install deploy prerequisites"
+  become: true
+  when: ansible_os_family == 'Debian'
+  apt: name={{ item }} update_cache=yes cache_valid_time=3600 state=present
+  with_items:
+    - git
+    - python3.4-venv
+
+- name: "Create Python venv and update pip tools"
+  become: true
+  become_user: "{{ deploy_user }}"
+  pip: name={{ item }} virtualenv="/home/{{ deploy_user }}/django_venv" virtualenv_command="/usr/bin/env python3 -m venv"
+  with_items:
+    - pip
+    - wheel
+    - setuptools

@@ -16,14 +16,5 @@
 
     - action: setup
 
-    - name: Install git
-      become: true
-      when: ansible_os_family == 'Debian'
-      apt:
-        name: git
-        update_cache: yes
-        cache_valid_time: 3600
-        state: present
-
   roles:
     - webapp

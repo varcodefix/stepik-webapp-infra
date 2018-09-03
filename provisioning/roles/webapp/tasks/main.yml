@@ -3,6 +3,7 @@
 
  - include: install_nginx.yml
  - include: install_gunicorn.yml
+ - include: pre_deploy.yml
  - include: deploy.yml
  - include: configure_nginx.yml
  - include: configure_gunicorn.yml

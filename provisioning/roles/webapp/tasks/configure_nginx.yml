@@ -1,6 +1,6 @@
 - name: "Ensure /home/{{ deploy_user }}/web/etc dir exists"
   become: true
-  file: 
+  file:
     path: "/home/{{ deploy_user }}/web/etc"
     state: directory
     owner: "{{ deploy_user }}"
@@ -23,4 +23,12 @@
     src: "/home/{{ deploy_user }}/web/etc/nginx.conf"
     dest: /etc/nginx/conf.d/stepik.conf
     state: link
+  notify: reload nginx
+
+- name: "Remove default nginx configuration"
+  become: true
+  file: name={{ item }} state=absent
+  with_items:
+    - /etc/nginx/conf.d/default.conf
+    - /etc/nginx/sites-enabled/default
   notify: reload nginx

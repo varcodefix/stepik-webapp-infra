@@ -4,4 +4,6 @@
 deploy_user: box
 webapp_git_repo_is_private: False
 webapp_git_repo_url: https://github.com/varcodefix/stepik-webapp-site.git
-webapp_git_branch: 01-09-01_gunicorn
+webapp_git_branch: 02-01-01_django
+
+pyenv_django_name: django_venv

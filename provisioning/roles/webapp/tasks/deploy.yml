@@ -1,10 +1,4 @@
-- name: "Create user for deploy"
-  become: true
-  user:
-    name: "{{ deploy_user }}"
-    comment: deploy user for webapp
-    state: present
-
+---
 - name: "The Hack: install an acl package"
   when: (ansible_os_family == 'Debian') and (webapp_git_repo_is_private == True)
   become: true
@@ -28,7 +22,7 @@
     become: true
     become_user: "{{ deploy_user }}"
     become_flags: '-HE' # keep environment hold the ssh-agent socket
-  
+
   - name: "Obtain the webapp code"
     become: true
     become_user: "{{ deploy_user }}"
@@ -41,6 +35,18 @@
     notify:
       - reload nginx
       - reload gunicorn
+
+  - name: Install requirements
+    become: true
+    become_user: "{{ deploy_user }}"
+    pip:
+      requirements: "/home/{{ deploy_user }}/web/requirements.txt"
+      virtualenv: "/home/{{ deploy_user }}/{{ pyenv_django_name }}"
+      virtualenv_python: python3
+    notify:
+      - reload nginx
+      - reload gunicorn
+
   always:
   - name: '(Hack: revoke access to the socket to {{ deploy_user }})'
     when: webapp_git_repo_is_private == True
@@ -49,7 +55,7 @@
     with_items:
       - "{{ ansible_env.SSH_AUTH_SOCK|dirname }}"
       - "{{ ansible_env.SSH_AUTH_SOCK }}"
-  
+
   # - name: "Remove an acl package"
   #   when: ansible_os_family == 'Debian'
   #   become: true

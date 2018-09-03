@@ -7,8 +7,7 @@
     group: "{{ deploy_user }}"
     mode: 0755
 
-
-- name: "Copy gunicorn wsgi app config to deploy user dir"
+- name: "Copy gunicorn wsgi hello app config to deploy user dir"
   become: true
   copy:
     src: files/hello_app.conf.py
@@ -18,10 +17,28 @@
     mode: 0644
   notify: reload gunicorn
 
-- name: "Copy app configuration to main gunicorn dir as symlink"
+- name: "Copy hello app configuration to main gunicorn dir as symlink"
   become: true
   file:
     src: "/home/{{ deploy_user }}/web/etc/hello.py"
     dest: /etc/gunicorn.d/hello.py
+    state: link
+  notify: reload gunicorn
+
+- name: "Copy gunicorn Django ask app config to deploy user dir"
+  become: true
+  template:
+    src: django_ask_app.conf.py.j2
+    dest: "/home/{{ deploy_user }}/web/etc/django_ask_app.conf.py"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: 0644
+  notify: reload gunicorn
+
+- name: "Copy Django ask app configuration to main gunicorn dir as symlink"
+  become: true
+  file:
+    src: "/home/{{ deploy_user }}/web/etc/django_ask_app.conf.py"
+    dest: /etc/gunicorn.d/django_ask_app.conf.py
     state: link
   notify: reload gunicorn

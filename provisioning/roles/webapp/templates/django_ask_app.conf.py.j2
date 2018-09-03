@@ -1,0 +1,11 @@
+CONFIG = {
+    'mode': 'wsgi',
+    'working_dir': '/home/{{ deploy_user }}/web/ask',
+    'python': '/home/{{ deploy_user }}/{{ pyenv_django_name }}/bin/python3',
+    'args': (
+        '--bind=0.0.0.0:8000',
+        '--workers=4',
+        '--timeout=60',
+        'ask.wsgi',
+    ),
+}
